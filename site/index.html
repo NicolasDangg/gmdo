@@ -1,0 +1,250 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>gmdo: get my data out of Canvas</title>
+<meta name="description" content="A command-line tool that signs in to your school's Canvas through a TinyFish browser profile and saves every grade, assignment and file as CSV, JSON and the files themselves.">
+<script>document.documentElement.classList.add('js')</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Red+Hat+Display:wght@900&family=Red+Hat+Text:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<header class="top">
+  <div class="container top-in">
+    <a class="wordmark" href="#top" aria-label="gmdo, back to top">gmdo</a>
+    <nav aria-label="Main">
+      <a class="link" href="#how">How it works</a>
+      <a class="link" href="#check">The check</a>
+      <a class="link" href="#questions">Questions</a>
+      <button class="link menu-word" type="button" aria-expanded="false" aria-controls="menu">Menu</button>
+      <a class="button" href="https://github.com/NicolasDangg/gmdo">Get the code</a>
+    </nav>
+  </div>
+  <div class="menu" id="menu" hidden>
+    <a href="#how">How it works</a>
+    <a href="#check">The check</a>
+    <a href="#questions">Questions</a>
+  </div>
+</header>
+
+<main id="top">
+
+<!-- Hero: the agent pulling a course out of Canvas, row by row -->
+<section class="hero" data-ground="#ecebe7" data-ink="#38450f" aria-labelledby="hero-title">
+  <div class="container hero-grid">
+    <div class="hero-copy">
+      <h1 class="hero-title" id="hero-title">Get my data out</h1>
+      <p class="lede">A command-line tool where a TinyFish agent signs in to your school’s Canvas and saves every grade, assignment and file you have there.</p>
+      <div class="hero-actions">
+        <a class="button solid" href="https://github.com/NicolasDangg/gmdo">Get the code</a>
+        <a class="link" href="#try">Try a command</a>
+      </div>
+    </div>
+
+    <div class="stage" data-ui role="img" aria-label="Animation: the TinyFish agent reads a course's Grades page row by row while the rows stream into records.csv and the files into documents.">
+      <div class="pane browser">
+        <div class="pane-bar"><span class="win-dots"><i></i><i></i><i></i></span><span class="win-url" id="st-url">canvas.your-school.edu/courses/…/grades</span></div>
+        <div class="pane-title"><span id="st-course">Grades</span><span class="agent-tag"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M2 8c3-4 7-4 10 0-3 4-7 4-10 0Zm10 0 3-2.5v5Z" fill="currentColor"/></svg>TinyFish agent</span></div>
+        <div class="grades" id="st-rows"></div>
+        <svg class="cursor" id="st-cursor" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 2l15 9-6.5 1.5L9 19z" fill="#1d2507" stroke="#f3f3f1" stroke-width="1.5" stroke-linejoin="round"/></svg>
+      </div>
+
+      <div class="stream" aria-hidden="true">
+        <svg viewBox="0 0 100 24" preserveAspectRatio="none"><path class="flow" d="M2 12H92"/><path d="M86 5l8 7-8 7" fill="none" stroke="currentColor" stroke-width="2.5"/></svg>
+      </div>
+
+      <div class="pane out">
+        <div class="pane-bar"><svg class="ico" viewBox="0 0 16 16" aria-hidden="true"><path d="M3 1.5h6.5L13 5v9.5H3z M9.5 1.5V5H13" fill="none" stroke="currentColor" stroke-width="1.3"/></svg><span>export/records.csv</span><span class="live"><i></i>writing</span></div>
+        <div class="csv" id="st-csv"></div>
+        <div class="docs" id="st-docs"><span class="docs-label"><svg class="ico" viewBox="0 0 16 16" aria-hidden="true"><path d="M1.5 3.5h5l1.5 2h6.5v8h-13z" fill="none" stroke="currentColor" stroke-width="1.3"/></svg>documents/</span></div>
+        <div class="status" id="st-status">Starting …</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Try it: the headline is an input -->
+<section class="section" id="try" data-ground="#ecebe7" data-ink="#38450f" aria-label="Try a command">
+  <div class="container">
+    <label class="sr-only" for="cmd">Type a gmdo command</label>
+    <div class="typed-line">
+      <input id="cmd" type="text" value="gmdo export --dry-run" spellcheck="false" autocomplete="off" autocapitalize="off">
+      <span class="caret" aria-hidden="true"></span>
+    </div>
+    <p class="lede">Type a command or pick one below. The answer comes from a real export of one student’s account, with every name taken out.</p>
+    <div class="answer term" data-ui aria-live="polite"><pre id="answer"><code>Portal: 43 courses, 1,168 assignments, 58 documents (140 MB)
+Changed since last export: 0 course(s) → agent runs (est. ~$0.00)</code></pre></div>
+    <div class="examples" role="group" aria-label="Example commands">
+      <button type="button" data-cmd="gmdo export"><code>gmdo export</code></button>
+      <button type="button" data-cmd="gmdo export --full"><code>gmdo export --full</code></button>
+      <button type="button" data-cmd="gmdo export --terms 2026-2027 --dry-run"><code>gmdo export --terms 2026-2027 --dry-run</code></button>
+      <button type="button" data-cmd="gmdo showcase"><code>gmdo showcase</code></button>
+    </div>
+  </div>
+</section>
+
+<!-- How it works: three rows, words left, output right -->
+<section class="section alt" id="how" data-ground="#e1dfd9" data-ink="#38450f">
+  <div class="container">
+    <header class="section-head" data-reveal>
+      <h2>Three commands</h2>
+      <p class="lede">Sign in once, export, open the files. TinyFish does the browsing; gmdo keeps the record straight.</p>
+    </header>
+
+    <div class="row" data-reveal>
+      <div class="row-text">
+        <h3>Sign in once, yourself.</h3>
+        <p>gmdo opens a TinyFish browser profile on your school’s sign-in page. You log in there, Google or Microsoft included. The profile keeps the cookies; gmdo keeps only the profile id.</p>
+        <div class="call"><pre><code>gmdo setup</code></pre><button class="copy-btn" type="button" data-copy="gmdo setup">Copy</button></div>
+      </div>
+      <div class="row-out" data-ui>
+        <div class="win">
+          <div class="win-bar"><span class="win-dots"><i></i><i></i><i></i></span><span class="win-url">canvas.your-school.edu/?login_success=1</span><span>TinyFish</span></div>
+          <div class="win-body">
+            <dl class="kv">
+              <dt>Browser profile</dt><dd>gmdo-canvas</dd>
+              <dt>Signed in with</dt><dd>Google, by you, in this window</dd>
+              <dt>Saved to profile</dt><dd class="nums">55 cookies</dd>
+              <dt>Password stored</dt><dd class="pill-ok">None</dd>
+            </dl>
+            <div class="tiles" id="tiles"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row" data-reveal>
+      <div class="row-text">
+        <h3>Export everything.</h3>
+        <p>Every course’s Grades page goes to the TinyFish agent as one run, all in a single batch. gmdo follows each run to the end and compares the rows it read with the number Canvas reports.</p>
+        <div class="call"><pre><code>gmdo export --terms "2025-2026,2026-2027"</code></pre><button class="copy-btn" type="button" data-copy='gmdo export --terms "2025-2026,2026-2027"'>Copy</button></div>
+      </div>
+      <div class="row-out" data-ui>
+        <div class="ui-head"><b>Agent runs, one per course</b><span id="runs-sum"></span></div>
+        <table class="ui-table" id="runs"><thead><tr><th>Course</th><th class="r">Rows read</th><th class="r">Canvas lists</th><th class="r">Steps</th><th>Run</th></tr></thead><tbody></tbody></table>
+      </div>
+    </div>
+
+    <div class="row" data-reveal>
+      <div class="row-text">
+        <h3>Open the files.</h3>
+        <p>One row per assignment, in CSV and JSON, each with a stable key, so running it again updates rows instead of adding duplicates. Your documents sit beside them in documents/.</p>
+        <div class="call"><pre><code>open export/records.csv</code></pre><button class="copy-btn" type="button" data-copy="open export/records.csv">Copy</button></div>
+      </div>
+      <div class="row-out" data-ui>
+        <div class="ui-head"><b id="rec-title">records.csv</b><span id="rec-sum"></span></div>
+        <table class="ui-table" id="records"><thead><tr><th>record_key</th><th>assignment_name</th><th>submitted</th><th class="r">score</th><th class="r">out of</th><th>matches Canvas</th></tr></thead><tbody></tbody></table>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Options: sentences with switches -->
+<section class="section" id="options" data-ground="#ecebe7" data-ink="#38450f">
+  <div class="container">
+    <header class="section-head" data-reveal>
+      <h2>Choose what it saves</h2>
+      <p class="lede">Each switch is a real flag you can pass to the export command.</p>
+    </header>
+    <div class="switches" data-reveal>
+      <div class="sw" data-on="true">
+        <div><p class="say">Download the files you handed in.</p><p class="then" id="sw-docs">Your own uploads and every attachment on your submissions, checked byte for byte. <code class="flag">--docs own,submissions</code></p></div>
+        <button class="toggle" role="switch" aria-checked="true" aria-label="Download the files you handed in"></button>
+      </div>
+      <div class="sw" data-on="false">
+        <div><p class="say">Add your teachers’ course files.</p><p class="then">1,780 more files, about 3.3 GB of slides and worksheets. <code class="flag">--docs course</code></p></div>
+        <button class="toggle" role="switch" aria-checked="false" aria-label="Add your teachers’ course files"></button>
+      </div>
+      <div class="sw" data-on="true">
+        <div><p class="say">Read only the courses that changed.</p><p class="then" id="sw-rerun">Unchanged courses never reach the agent, so they cost nothing.</p></div>
+        <button class="toggle" role="switch" aria-checked="true" aria-label="Read only the courses that changed"></button>
+      </div>
+      <div class="sw" data-on="false">
+        <div><p class="say">Start again from scratch.</p><p class="then" id="sw-full">Every course goes back to the agent. <code class="flag">--full</code></p></div>
+        <button class="toggle" role="switch" aria-checked="false" aria-label="Start again from scratch"></button>
+      </div>
+      <div class="sw" data-on="false">
+        <div><p class="say">Hide the scores in the showcase too.</p><p class="then">Names are always taken out; this blanks the marks as well. <code class="flag">--hide-scores</code></p></div>
+        <button class="toggle" role="switch" aria-checked="false" aria-label="Hide the scores in the showcase too"></button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- The check -->
+<section class="section alt" id="check" data-ground="#e1dfd9" data-ink="#38450f">
+  <div class="container">
+    <header class="section-head" data-reveal>
+      <h2>Every course checked</h2>
+      <p class="lede">After each run, gmdo asks Canvas how many assignments the course has and compares. A course that comes back short is read again; if it is still short, the export says so and lists what is missing.</p>
+    </header>
+    <div data-reveal>
+      <table class="check" id="checktable">
+        <thead><tr><th>School year</th><th>Course</th><th class="r">Rows read / Canvas lists</th><th class="r">Result</th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- Questions -->
+<section class="section" id="questions" data-ground="#ecebe7" data-ink="#38450f">
+  <div class="container">
+    <header class="section-head" data-reveal>
+      <h2>Questions</h2>
+    </header>
+    <div class="faq-text" data-reveal>
+      <p><b>Does gmdo ever see my password?</b> No. <code>gmdo setup</code> opens a TinyFish browser on your school’s sign-in page and you sign in there yourself, Google or Microsoft included. The browser profile keeps the cookies. The tool stores a profile id and nothing else.</p>
+      <p><b>What does TinyFish do here?</b> Four things. A browser profile holds your sign-in. The agent opens each course’s Grades page and reads every row, sent as one batch of runs. The runs endpoint tracks each run to the end and resumes after a crash. The same signed-in browser downloads your files.</p>
+      <p><b>Why have an agent read the page?</b> It reads what you can see, the way you would. gmdo also reads the data Canvas loads behind that page, and uses it to check the agent: the count of assignments per course, and whether each score matches.</p>
+      <p><b>What does a run cost?</b> TinyFish charges per agent step, $0.016 at the time of writing. A course takes six to twelve steps. Unchanged courses are never sent, so a rerun in a quiet week costs nothing. <code>--dry-run</code> prints the estimate first, and <code>--budget</code> stops anything above it.</p>
+      <p><b>What happens if I get signed out?</b> gmdo notices before it exports anything and tells you to run <code>gmdo setup</code> again. It never saves a sign-in page as your data.</p>
+      <p><b>What if a run comes back short or fails?</b> It is read once more. If it is still short, courses.csv marks the course incomplete and manifest.json lists the assignments that are missing.</p>
+      <p><b>What if Canvas hasn’t posted a grade?</b> The cell stays empty and the row records Canvas’s own state, such as pending review. gmdo never fills in a number.</p>
+      <p><b>Is this allowed?</b> It reads your own account, at a human pace, and the agent is told never to submit or change anything. Check your school’s rules before running it on a schedule.</p>
+      <p><b>Can I share my export?</b> Run <code>gmdo showcase</code>. Course names become plain subjects, names of students and teachers become [student] and [teacher], comments become a count, and the copy is searched for every name before it is kept.</p>
+      <p><b>Does it work on other portals?</b> It is built and tested on one school’s Canvas. Everything Canvas-specific lives in one adapter file, so another Canvas school should need little or no change.</p>
+    </div>
+  </div>
+</section>
+
+<!-- CTA (full-bleed field) -->
+<a class="cta" href="https://github.com/NicolasDangg/gmdo" data-ground="#38450f" data-ink="#ecebe7">
+  <span class="container cta-in">
+    <span class="cta-top">
+      <span class="cta-say">The code, the tests and a setup guide are on GitHub.</span>
+      <svg class="cta-arrow" viewBox="0 0 48 48" aria-hidden="true"><path d="M12 36 36 12M16 12h20v20" fill="none" stroke="currentColor" stroke-width="4"/></svg>
+    </span>
+    <span class="cta-word">Clone</span>
+  </span>
+</a>
+
+</main>
+
+<!-- Footer (full-bleed field) -->
+<footer class="foot" data-ground="#e1dfd9" data-ink="#38450f">
+  <div class="container foot-in">
+    <div class="foot-notes">
+      <ul class="plain">
+        <li>Built for the TinyFish “Get My Data Out” bounty.</li>
+        <li>Python 3.11 or newer. Runs on your machine; your export stays there.</li>
+      </ul>
+      <a class="link" href="#top">Back to top</a>
+    </div>
+    <a class="foot-big" href="https://github.com/NicolasDangg/gmdo">gmdo export</a>
+    <div class="foot-meta">
+      <ul class="plain row-list"><li><a class="link" href="https://github.com/NicolasDangg/gmdo#readme">README</a></li><li><a class="link" href="https://github.com/NicolasDangg/gmdo/tree/main/tests">Tests</a></li></ul>
+      <p>Uses TinyFish browser profiles, batch agent runs and the runs API.</p>
+      <p>2026</p>
+    </div>
+  </div>
+</footer>
+
+<script src="data.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

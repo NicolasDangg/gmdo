@@ -1,0 +1,16 @@
+[project]
+name = "getmydataout"
+version = "0.1.0"
+description = "Export your Canvas LMS history (grades, assignments, documents) with a TinyFish agent signed in through a browser profile."
+requires-python = ">=3.11"
+dependencies = ["httpx>=0.27", "pydantic>=2.7", "typer>=0.12", "playwright>=1.48"]
+
+[project.optional-dependencies]
+dev = ["pytest>=8", "respx>=0.21"]
+
+[project.scripts]
+gmdo = "getmydataout.cli:app"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
