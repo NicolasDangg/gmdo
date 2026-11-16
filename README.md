@@ -1,5 +1,7 @@
 # gmdo: get my data out of Canvas
 
+Page: https://gmdo-ten.vercel.app · Notes for reviewers: [REVIEWERS.md](REVIEWERS.md)
+
 My school runs its coursework on Canvas LMS (`lms.vinschool.edu.vn`). Students get no export: grades,
 assignment history and the files you handed in live behind a Google sign-in and a dozen course menus.
 `gmdo` signs in as me through a TinyFish browser profile, has the TinyFish Agent read every course's
