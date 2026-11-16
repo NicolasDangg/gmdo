@@ -87,3 +87,14 @@ def test_refuses_when_a_name_survives(tmp_path):
     with pytest.raises(SystemExit):
         build(src, tmp_path / "showcase", red)
     assert not (tmp_path / "showcase").exists()
+
+
+def test_accounts_named_after_a_subject_are_not_people():
+    from getmydataout.showcase import SUBJECT_WORDS, fold
+    assert all(fold(w) in SUBJECT_WORDS for w in "Vietnamese Literature".split())
+    assert not all(fold(w) in SUBJECT_WORDS for w in "Lucas Vale".split())
+
+
+def test_subject_words_in_course_names_are_not_handles():
+    hs = handles_from_courses([{"course_code": "THPT.HAR-AS.NV-11", "course_name": "1104-VIETNAMESE LITERATURE-PHAMXY9-THPT.HAR"}])
+    assert hs == {"PHAMXY9"}

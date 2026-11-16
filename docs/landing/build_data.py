@@ -49,8 +49,15 @@ def score_rows(cid, n=7):
 
 FEATURE = "A-Level Physics"     # the subject the mockups lead with
 label_of = {c["course_id"]: c["course_name"] or "" for c in courses}
+def english_rows(cid):
+    """Share of a course's assignment names written in plain English (ASCII), so the page reads anywhere."""
+    names = [r.get("assignment_name") or "" for r in records if r["course_id"] == cid]
+    return sum(1 for n in names if n.isascii()) / max(1, len(names))
+
+
 ranked = sorted({r["course_id"] for r in records},
-                key=lambda cid: (not label_of.get(cid, "").startswith(FEATURE),
+                key=lambda cid: (english_rows(cid) < 0.8,
+                                 not label_of.get(cid, "").startswith(FEATURE),
                                  -sum(1 for r in records if r["course_id"] == cid and r.get("score"))))
 sample_course = ranked[0] if ranked else None
 
@@ -86,7 +93,7 @@ data = {
         {"id": cid, "label": label_of.get(cid), "listed": next((c.get("portal_assignments") for c in courses if c["course_id"] == cid), None),
          "rows": [{"key": r["record_key"], "name": r.get("assignment_name"), "score": r.get("score"), "out_of": r.get("out_of")}
                   for r in sorted((r for r in records if r["course_id"] == cid), key=lambda r: r.get("score") is None)[:8]]}
-        for cid in ranked[:5]
+        for cid in [c for c in ranked if english_rows(c) >= 0.8][:5]
     ],
     "doc_names": [d.get("filename") for d in docs if d.get("filename")][:12],
 }

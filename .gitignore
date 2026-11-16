@@ -16,3 +16,5 @@ showcase/
 *.egg-info/
 .pytest_cache/
 .impeccable/
+docs/SUBMISSION.md
+docs/launch/

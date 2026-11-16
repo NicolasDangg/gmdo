@@ -81,6 +81,11 @@ VI_SUBJECTS = {
 }
 
 
+SUBJECT_WORDS = {fold(w) for text in list(SUBJECTS.values()) + list(VI_SUBJECTS.values()) + list(VI_SUBJECTS)
+                 for w in re.split(r"[\s,()-]+", text) if w} | {
+    "department", "team", "teachers", "teacher", "admin", "subject", "group", "level", "a-level", "as", "and"}
+
+
 def english_subject(raw: str) -> str:
     raw = raw.strip()
     level = ""
@@ -94,7 +99,8 @@ def handles_from_courses(courses: list[dict]) -> set[str]:
     for c in courses:
         for field in ("course_code", "course_name"):
             for seg in re.split(r"[-\s]+", c.get(field) or ""):
-                if HANDLE.match(seg) and seg not in KEYWORDS and not seg.startswith("THPT"):
+                if HANDLE.match(seg) and seg not in KEYWORDS and not seg.startswith("THPT") \
+                        and fold(seg) not in SUBJECT_WORDS:
                     out.add(seg)
     return out
 
@@ -109,6 +115,8 @@ def collect_terms(pb, courses: list[dict]) -> dict[str, str]:
             return
         full = re.sub(r"\s+", " ", full.replace(",", " ")).strip()
         parts = full.split(" ")
+        if all(fold(p) in SUBJECT_WORDS for p in parts):
+            return                                   # a shared account named after its subject, not a person
         variants = {full, " ".join(reversed(parts))}
         if len(parts) > 1:
             variants |= {f"{parts[-1]} {parts[0]}", f"{parts[0]} {parts[-1]}"}
